@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-
-getbinary = lambda x, n: format(x, 'b').zfill(n)
+from core.parser import RadioTapHeaderParser, ManagementFrameFrameControlParser
 
 
 class Filter(ABC):
@@ -30,11 +29,10 @@ class AllMatchFilter(Filter):
 class ManagementFrameFilter(Filter):
 
     def match(self, frame: bytes) -> bool:
-        frame_control = frame[0:2]
-        frame_control_str = getbinary(frame_control[0], 8) + getbinary(frame_control[1], 8)
+        _, frame = RadioTapHeaderParser.parse(frame)
 
-        proto_version = frame_control_str[0:2]
-        frame_type = frame_control_str[2:4]
-        frame_subtype = frame_control_str[4:7]
+        frame_control = ManagementFrameFrameControlParser.parse(frame[0:2])
 
-        return proto_version == "00" and frame_type == "00"
+        return frame_control.proto_version == "00" and frame_control.frame_type == "00"
+
+        return False
