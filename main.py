@@ -14,7 +14,11 @@ packet_sniffer = PacketSniffer(
     ManagementFrameParser(),
     FilterAggregate(
         RadioTapHeaderFilter(),
-        ManagementFrameFilter()
+        ManagementFrameFilter(),
+        FilterAlternative(
+            BeaconFrameFilter(),
+            ProbeResponseFrameFilter()
+        )
     )
 )
 

@@ -49,17 +49,36 @@ class RadioTapHeaderFilter(Filter):
 
 class ManagementFrameFilter(Filter):
 
+    PROTO_VERSION = "00"
+    MANAGEMENT_FRAME_TYPE = "00"
+
     def match(self, frame: bytes) -> bool:
         _, frame = RadioTapHeaderParser.parse(frame)
 
         frame_control = ManagementFrameFrameControlParser.parse(frame[0:2])
 
-        return frame_control.proto_version == "00" and frame_control.frame_type == "00"
+        return frame_control.proto_version == self.PROTO_VERSION and frame_control.frame_type == self.MANAGEMENT_FRAME_TYPE
 
 
 class BeaconFrameFilter(Filter):
-    ...
+
+    BEACON_SUBTYPE = "1000"
+
+    def match(self, frame: bytes) -> bool:
+        _, frame = RadioTapHeaderParser.parse(frame)
+
+        frame_control = ManagementFrameFrameControlParser.parse(frame[0:2])
+
+        return frame_control.frame_subtype == self.BEACON_SUBTYPE
 
 
 class ProbeResponseFrameFilter(Filter):
-    ...
+
+    PROBE_RESPONSE_SUBTYPE = "0101"
+
+    def match(self, frame: bytes) -> bool:
+        _, frame = RadioTapHeaderParser.parse(frame)
+
+        frame_control = ManagementFrameFrameControlParser.parse(frame[0:2])
+
+        return frame_control.frame_subtype == self.PROBE_RESPONSE_SUBTYPE
