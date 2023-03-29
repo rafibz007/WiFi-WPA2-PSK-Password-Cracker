@@ -75,41 +75,32 @@ class ManagementFrame:
             self,
             radio_tap_header: ManagementFrameRadioTapHeader,
             frame_control: ManagementFrameFrameControl,
-            duration_id: str,
-            addr1: str,
-            addr2: str,
-            addr3: str,
-            addr4: str,
+            duration: str,
+            dest_addr: str,
+            src_addr: str,
+            bssid: str,
             sequence_control: str,
-            qos_control: str,
-            ht_control: str,
             body: str,
             fcs: str
     ):
         self.radio_tap_header: ManagementFrameRadioTapHeader = radio_tap_header
         self.frame_control: ManagementFrameFrameControl = frame_control
-        self.duration_id: str = duration_id
-        self.addr1: str = addr1
-        self.addr2: str = addr2
-        self.addr3: str = addr3
-        self.addr4: str = addr4
+        self.duration: str = duration
+        self.dest_addr: str = dest_addr
+        self.src_addr: str = src_addr
+        self.bssid: str = bssid
         self.sequence_control: str = sequence_control
-        self.qos_control: str = qos_control
-        self.ht_control: str = ht_control
         self.body: str = body
         self.fcs: str = fcs
 
     def __str__(self):
         return f"Management: {{ " \
                f"frame control = {self.frame_control},  " \
-               f"duration/id = {self.duration_id}, " \
-               f"addr1 = {self.addr1}, " \
-               f"addr2 = {self.addr2}, " \
-               f"addr3 = {self.addr3}, " \
+               f"duration = {self.duration}, " \
+               f"dest addr = {self.dest_addr}, " \
+               f"src addr = {self.src_addr}, " \
+               f"bssid = {self.bssid}, " \
                f"sequence control = {self.sequence_control}, " \
-               f"addr4 = {self.addr4}, " \
-               f"qos control = {self.qos_control}, " \
-               f"ht_control = {self.ht_control}, " \
                f"body = {self.body}, " \
                f"fcs = {self.fcs}" \
                f"}}"
