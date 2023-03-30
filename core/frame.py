@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Dict
+from typing import Dict, Tuple
 
 
 class Frame(ABC):
@@ -70,6 +70,15 @@ class ManagementFrameRadioTapHeader:
         self.header_len: int = header_len
 
 
+class ManagementFrameBody:
+    def __init__(self, info_elements, fixed_fields: bytes):
+        self.fixed_fields: bytes = fixed_fields
+        self.info_elements: Dict[int: Tuple[int, str]] = info_elements  # id -> len, value
+
+    def __str__(self):
+        return f"Body: {{ {';'.join([ f'id={id}, len={len_and_value[0]}, value={len_and_value[1]} ' for id, len_and_value in self.info_elements.items() ])} }}"
+
+
 class ManagementFrame:
     def __init__(
             self,
@@ -80,7 +89,7 @@ class ManagementFrame:
             src_addr: str,
             bssid: str,
             sequence_control: str,
-            body: str,
+            body: ManagementFrameBody,
             fcs: str
     ):
         self.radio_tap_header: ManagementFrameRadioTapHeader = radio_tap_header
@@ -90,7 +99,7 @@ class ManagementFrame:
         self.src_addr: str = src_addr
         self.bssid: str = bssid
         self.sequence_control: str = sequence_control
-        self.body: str = body
+        self.body: ManagementFrameBody = body
         self.fcs: str = fcs
 
     def __str__(self):

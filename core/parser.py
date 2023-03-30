@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Tuple
+from typing import Tuple, Dict
 
 from core.frame import EthernetFrame, Frame, RawFrame, ManagementFrame, ManagementFrameRadioTapHeader, \
-    ManagementFrameFrameControl
+    ManagementFrameFrameControl, ManagementFrameBody
 
 
 class Parser(ABC):
@@ -59,6 +59,30 @@ class ManagementFrameFrameControlParser:
         )
 
 
+class ManagementFrameBodyParser:
+
+    SUPPORTED_IDS = [0]
+
+    @staticmethod
+    def parse(body: bytes) -> ManagementFrameBody:
+        fixed_fields = body[:12]
+        body = body[12:]
+
+        info_elements: Dict[int: Tuple[int, str]] = {}
+        while len(body) > 0:
+
+            element_id: int = body[0]
+            length: int = body[1]
+            value: str = body[2: 2+length].decode(errors="ignore")
+
+            body = body[2+length:]
+
+            if element_id in ManagementFrameBodyParser.SUPPORTED_IDS:
+                info_elements[element_id] = (length, value)
+
+        return ManagementFrameBody(info_elements, fixed_fields)
+
+
 class ManagementFrameParser(Parser):
 
     def parse(self, frame: bytes) -> ManagementFrame:
@@ -69,7 +93,7 @@ class ManagementFrameParser(Parser):
         src_addr: str = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[10:16]))
         bssid: str = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[16:22]))
         sequence_control: str = frame[22:24].hex()
-        body: str = frame[24: -4].decode(errors="ignore")  # todo fix me, tmp poc
+        body: ManagementFrameBody = ManagementFrameBodyParser.parse(frame[24: -4])
         fcs: str = frame[-4: -1].hex()
 
         return ManagementFrame(
