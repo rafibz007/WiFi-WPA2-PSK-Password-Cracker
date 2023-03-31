@@ -61,7 +61,7 @@ class ManagementFrameFrameControlParser:
 
 class ManagementFrameBodyParser:
 
-    SUPPORTED_IDS = [0]
+    SUPPORTED_IDS = [ManagementFrameBody.SSID]
 
     @staticmethod
     def parse(body: bytes) -> ManagementFrameBody:

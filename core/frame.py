@@ -71,6 +71,8 @@ class ManagementFrameRadioTapHeader:
 
 
 class ManagementFrameBody:
+    SSID = 0
+
     def __init__(self, info_elements, fixed_fields: bytes):
         self.fixed_fields: bytes = fixed_fields
         self.info_elements: Dict[int: Tuple[int, str]] = info_elements  # id -> len, value

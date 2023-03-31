@@ -22,3 +22,7 @@ class PacketSniffer:
                 # print(type(frame), frame)
                 if self._filter.match(frame):
                     yield self._parser.parse(frame)
+
+
+class PacketSender:
+    ...
