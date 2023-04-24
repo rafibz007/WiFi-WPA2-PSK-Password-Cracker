@@ -80,7 +80,7 @@ class ManagementFrameBody:
         self.info_elements: Dict[int: Tuple[int, str]] = info_elements  # id -> len, value
 
     def __str__(self):
-        return f"Body: {{ {';'.join([ f'id={id}, len={len_and_value[0]}, value={len_and_value[1]} ' for id, len_and_value in self.info_elements.items() ])} }}"
+        return f"Body: {{ {';'.join([f'id={id}, len={len_and_value[0]}, value={len_and_value[1]} ' for id, len_and_value in self.info_elements.items()])} }}"
 
 
 class ManagementFrame:
@@ -119,3 +119,38 @@ class ManagementFrame:
                f"}}"
 
 
+class DataFrame(Frame):
+    def __init__(
+            self,
+            radio_tap_header: ManagementFrameRadioTapHeader,
+            frame_control: ManagementFrameFrameControl,
+            duration: str,
+            dest_addr: str,
+            bssid: str,
+            source_addr: str,
+            frame_number_and_sequence: str,
+            tkip_params: str,
+            data: str,
+            check_sequence: str,
+    ):
+        self.radio_tap_header: ManagementFrameRadioTapHeader = radio_tap_header
+        self.frame_control: ManagementFrameFrameControl = frame_control
+        self.duration: str = duration
+        self.dest_addr: str = dest_addr
+        self.bssid: str = bssid
+        self.source_addr: str = source_addr
+        self.frame_number_and_sequence: str = frame_number_and_sequence
+        self.tkip_params: str = tkip_params
+        self.data: str = data
+        self.check_sequence: str = check_sequence
+
+    def __str__(self):
+        return f"Data: {{ " \
+               f"frame control = {self.frame_control},  " \
+               f"duration = {self.duration}, " \
+               f"dest addr = {self.dest_addr}, " \
+               f"bssid = {self.bssid}, " \
+               f"src addr = {self.source_addr}, " \
+               f"frame number and sequence = {self.frame_number_and_sequence}, " \
+               f"TKIP = {self.tkip_params}, " \
+               f"}}"

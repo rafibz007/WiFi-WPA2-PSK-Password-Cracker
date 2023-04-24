@@ -21,6 +21,8 @@ packet_sniffer = PacketSniffer(
     )
 )
 
+# todo send probe request when changing channels
+
 thread = Thread(target=alternate_channels, args=(iface,), daemon=True)
 thread.start()
 

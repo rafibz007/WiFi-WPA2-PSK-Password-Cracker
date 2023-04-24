@@ -3,7 +3,7 @@ from collections import defaultdict
 from typing import Tuple, Dict, Any
 
 from core.frame import EthernetFrame, Frame, RawFrame, ManagementFrame, ManagementFrameRadioTapHeader, \
-    ManagementFrameFrameControl, ManagementFrameBody
+    ManagementFrameFrameControl, ManagementFrameBody, DataFrame
 
 
 class Parser(ABC):
@@ -118,3 +118,32 @@ class ManagementFrameParser(Parser):
         )
 
 
+class DataFrameParser(Parser):
+    def parse(self, frame: bytes) -> Frame:
+        radio_tap_header, frame = RadioTapHeaderParser.parse(frame)
+        frame_control = ManagementFrameFrameControlParser.parse(frame[0:2])
+        duration: str = frame[2:4].hex()
+
+        # todo need to specify this to subtype and parse then
+        # todo FIRST DETERMINE WHICH SUBTYPE CAN BE USED TO CHECK WETHER USER IS CONNECTED
+        # TODO THEN FILTER CORRECTLY
+        dest_addr = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[4:10]))
+        bssid = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[10:16]))
+        source_addr = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[16:22]))
+        frame_number_and_sequence = frame[22:24].hex()
+        tkip_params = frame[24:32].hex()
+        data = frame[50:-4].hex()
+        check_sequence = frame[-4:-1].hex()
+
+        return DataFrame(
+            radio_tap_header,
+            frame_control,
+            duration,
+            dest_addr,
+            bssid,
+            source_addr,
+            frame_number_and_sequence,
+            tkip_params,
+            data,
+            check_sequence,
+        )
