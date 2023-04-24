@@ -64,10 +64,11 @@ class ManagementFrameFrameControl:
 
 
 class ManagementFrameRadioTapHeader:
-    def __init__(self, version: str, pad: str, header_len: int):
+    def __init__(self, version: str, pad: str, header_len: int, channel_frequency: int):
         self.version: str = version
         self.pad: str = pad
         self.header_len: int = header_len
+        self.channel_frequency: int = channel_frequency
 
 
 class ManagementFrameBody:

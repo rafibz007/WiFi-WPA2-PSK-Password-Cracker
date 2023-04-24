@@ -37,8 +37,13 @@ class RadioTapHeaderParser:
         version = hex(frame[0])
         pad = hex(frame[1])
         header_length = int.from_bytes(frame[2:4], "little")
+        # present_flags = frame[4:16]
+        # mac_timestamp = frame[16:24]
+        # flags = frame[24]
+        # data_rate = frame[25]
+        channel_frequency = int.from_bytes(frame[26:28], "little")
         return ManagementFrameRadioTapHeader(
-            version, pad, header_length
+            version, pad, header_length, channel_frequency
         ), frame[header_length:]
 
 

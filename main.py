@@ -40,13 +40,14 @@ thread.start()
 
 found_aps = {}
 
-print(f"{'BSSID' : >20}   {'SSID' : <30}")
+print(f"{'BSSID' : >20} | {'FREQUENCY' :^10} | {'SSID' : <30}")
+print(f"{'':->20}-+-{'':-^10}-+-{'':-<30}")
 for packet in packet_sniffer.listen():
     # print(packet)
     packet: ManagementFrame
     if packet.body.info_elements[ManagementFrameBody.SSID][1] not in found_aps:
         found_aps[packet.body.info_elements[ManagementFrameBody.SSID][1]] = packet.bssid
-        print(f"{packet.bssid : >20}   {packet.body.info_elements[ManagementFrameBody.SSID][1] : <30}")
+        print(f"{packet.bssid : >20} | {packet.radio_tap_header.channel_frequency :^10} | {packet.body.info_elements[ManagementFrameBody.SSID][1] : <30}")
 
     # packet_sniffer.send()
 
