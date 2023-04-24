@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, Dict
+from collections import defaultdict
+from typing import Tuple, Dict, Any
 
 from core.frame import EthernetFrame, Frame, RawFrame, ManagementFrame, ManagementFrameRadioTapHeader, \
     ManagementFrameFrameControl, ManagementFrameBody
@@ -66,24 +67,27 @@ class ManagementFrameFrameControlParser:
 
 class ManagementFrameBodyParser:
 
-    SUPPORTED_IDS = [ManagementFrameBody.SSID]
+    SUPPORTED_IDS = {
+        ManagementFrameBody.SSID: lambda ssid: ssid.decode(errors="ignore"),
+        ManagementFrameBody.CURRENT_CHANNEL: lambda curr_channel: str(int.from_bytes(curr_channel, "little")),
+    }
 
     @staticmethod
     def parse(body: bytes) -> ManagementFrameBody:
         fixed_fields = body[:12]
         body = body[12:]
 
-        info_elements: Dict[int: Tuple[int, str]] = {}
+        info_elements: Dict[int: Tuple[int, str]] = defaultdict(lambda: (0, "N/A"))
         while len(body) > 0:
 
             element_id: int = body[0]
             length: int = body[1]
-            value: str = body[2: 2+length].decode(errors="ignore")
-
-            body = body[2+length:]
 
             if element_id in ManagementFrameBodyParser.SUPPORTED_IDS:
+                value = ManagementFrameBodyParser.SUPPORTED_IDS[element_id](body[2:2+length])
                 info_elements[element_id] = (length, value)
+
+            body = body[2+length:]
 
         return ManagementFrameBody(info_elements, fixed_fields)
 

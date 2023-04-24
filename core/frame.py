@@ -73,6 +73,7 @@ class ManagementFrameRadioTapHeader:
 
 class ManagementFrameBody:
     SSID = 0
+    CURRENT_CHANNEL = 3
 
     def __init__(self, info_elements, fixed_fields: bytes):
         self.fixed_fields: bytes = fixed_fields
