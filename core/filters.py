@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from core.parser import RadioTapHeaderParser, ManagementFrameFrameControlParser
+from core.parser import RadioTapHeaderParser, FrameControlParser, QoSDataFrameLogicalLinkControlParser
 
 
 class Filter(ABC):
@@ -55,7 +55,7 @@ class ManagementFrameFilter(Filter):
     def match(self, frame: bytes) -> bool:
         _, frame = RadioTapHeaderParser.parse(frame)
 
-        frame_control = ManagementFrameFrameControlParser.parse(frame[0:2])
+        frame_control = FrameControlParser.parse(frame[0:2])
 
         return frame_control.proto_version == self.PROTO_VERSION and frame_control.frame_type == self.MANAGEMENT_FRAME_TYPE
 
@@ -67,7 +67,7 @@ class BeaconFrameFilter(Filter):
     def match(self, frame: bytes) -> bool:
         _, frame = RadioTapHeaderParser.parse(frame)
 
-        frame_control = ManagementFrameFrameControlParser.parse(frame[0:2])
+        frame_control = FrameControlParser.parse(frame[0:2])
 
         return frame_control.frame_subtype == self.BEACON_SUBTYPE
 
@@ -79,7 +79,7 @@ class ProbeResponseFrameFilter(Filter):
     def match(self, frame: bytes) -> bool:
         _, frame = RadioTapHeaderParser.parse(frame)
 
-        frame_control = ManagementFrameFrameControlParser.parse(frame[0:2])
+        frame_control = FrameControlParser.parse(frame[0:2])
 
         return frame_control.frame_subtype == self.PROBE_RESPONSE_SUBTYPE
 
@@ -91,6 +91,31 @@ class DataFrameFilter(Filter):
     def match(self, frame: bytes) -> bool:
         _, frame = RadioTapHeaderParser.parse(frame)
 
-        frame_control = ManagementFrameFrameControlParser.parse(frame[0:2])
+        frame_control = FrameControlParser.parse(frame[0:2])
 
         return frame_control.proto_version == self.PROTO_VERSION and frame_control.frame_type == self.DATA_FRAME_TYPE
+
+
+class QoSDataFrameFilter(Filter):
+
+    QOS_DATA_SUBTYPE = "1000"
+
+    def match(self, frame: bytes) -> bool:
+        _, frame = RadioTapHeaderParser.parse(frame)
+
+        frame_control = FrameControlParser.parse(frame[0:2])
+
+        return frame_control.frame_subtype == self.QOS_DATA_SUBTYPE
+
+
+class LogicalLinkControlAuthenticationFilter(Filter):
+
+    LLC_AUTHENTICATION_TYPE = "888e"
+
+    def match(self, frame: bytes) -> bool:
+        _, frame = RadioTapHeaderParser.parse(frame)
+
+        # skip to llc part
+        llc = QoSDataFrameLogicalLinkControlParser.parse(frame[26:34])
+
+        return llc.llc_type == self.LLC_AUTHENTICATION_TYPE

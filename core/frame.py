@@ -29,32 +29,16 @@ class RawFrame(Frame):
         return str(self.raw_data)
 
 
-class ManagementFrameFrameControl:
+class FrameControl:
     def __init__(
             self,
             proto_version: str,
             frame_type: str,
             frame_subtype: str,
-            # to_ds: str,
-            # from_ds: str,
-            # more_fragments: str,
-            # retry: str,
-            # power_management: str,
-            # more_data: str,
-            # protected_frame: str,
-            # htc_order: str
     ):
         self.proto_version: str = proto_version
         self.frame_type: str = frame_type
         self.frame_subtype: str = frame_subtype
-        # self.to_ds: str = to_ds
-        # self.from_ds: str = from_ds
-        # self.more_fragments: str = more_fragments
-        # self.retry: str = retry
-        # self.power_management: str = power_management
-        # self.more_data: str = more_data
-        # self.protected_frame: str = protected_frame
-        # self.htc_order: str = htc_order
 
     def __str__(self):
         return f"FrameControl: {{ proto_version = {self.proto_version}, " \
@@ -83,11 +67,11 @@ class ManagementFrameBody:
         return f"Body: {{ {';'.join([f'id={id}, len={len_and_value[0]}, value={len_and_value[1]} ' for id, len_and_value in self.info_elements.items()])} }}"
 
 
-class ManagementFrame:
+class ManagementFrame(Frame):
     def __init__(
             self,
             radio_tap_header: ManagementFrameRadioTapHeader,
-            frame_control: ManagementFrameFrameControl,
+            frame_control: FrameControl,
             duration: str,
             dest_addr: str,
             src_addr: str,
@@ -97,7 +81,7 @@ class ManagementFrame:
             fcs: str
     ):
         self.radio_tap_header: ManagementFrameRadioTapHeader = radio_tap_header
-        self.frame_control: ManagementFrameFrameControl = frame_control
+        self.frame_control: FrameControl = frame_control
         self.duration: str = duration
         self.dest_addr: str = dest_addr
         self.src_addr: str = src_addr
@@ -119,11 +103,20 @@ class ManagementFrame:
                f"}}"
 
 
+class QoSDataFrameLogicalLinkControl:
+    def __init__(self, dsap: str, ssap: str, control_field: str, org_code: str, llc_type: str):
+        self.dsap: str = dsap
+        self.ssap: str = ssap
+        self.control_field: str = control_field
+        self.org_code: str = org_code
+        self.llc_type: str = llc_type
+
+
 class DataFrame(Frame):
     def __init__(
             self,
             radio_tap_header: ManagementFrameRadioTapHeader,
-            frame_control: ManagementFrameFrameControl,
+            frame_control: FrameControl,
             duration: str,
             dest_addr: str,
             bssid: str,
@@ -134,7 +127,7 @@ class DataFrame(Frame):
             check_sequence: str,
     ):
         self.radio_tap_header: ManagementFrameRadioTapHeader = radio_tap_header
-        self.frame_control: ManagementFrameFrameControl = frame_control
+        self.frame_control: FrameControl = frame_control
         self.duration: str = duration
         self.dest_addr: str = dest_addr
         self.bssid: str = bssid

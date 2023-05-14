@@ -3,7 +3,7 @@ from collections import defaultdict
 from typing import Tuple, Dict, Any
 
 from core.frame import EthernetFrame, Frame, RawFrame, ManagementFrame, ManagementFrameRadioTapHeader, \
-    ManagementFrameFrameControl, ManagementFrameBody, DataFrame
+    FrameControl, ManagementFrameBody, DataFrame, QoSDataFrameLogicalLinkControl
 
 
 class Parser(ABC):
@@ -52,13 +52,13 @@ class RadioTapHeaderParser:
 getbinary = lambda x, n: format(x, 'b').zfill(n)
 
 
-class ManagementFrameFrameControlParser:
+class FrameControlParser:
 
     @staticmethod
-    def parse(frame_control: bytes) -> ManagementFrameFrameControl:
+    def parse(frame_control: bytes) -> FrameControl:
         frame_control_bits = getbinary(frame_control[0], 8) + getbinary(frame_control[1], 8)
 
-        return ManagementFrameFrameControl(
+        return FrameControl(
             frame_control_bits[6:8],
             frame_control_bits[4:6],
             frame_control_bits[0:4]
@@ -96,7 +96,7 @@ class ManagementFrameParser(Parser):
 
     def parse(self, frame: bytes) -> ManagementFrame:
         radio_tap_header, frame = RadioTapHeaderParser.parse(frame)
-        frame_control = ManagementFrameFrameControlParser.parse(frame[0:2])
+        frame_control = FrameControlParser.parse(frame[0:2])
         duration: str = frame[2:4].hex()
         dest_addr: str = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[4:10]))
         src_addr: str = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[10:16]))
@@ -118,10 +118,23 @@ class ManagementFrameParser(Parser):
         )
 
 
+class QoSDataFrameLogicalLinkControlParser:
+
+    @staticmethod
+    def parse(llc: bytes) -> QoSDataFrameLogicalLinkControl:
+
+        return QoSDataFrameLogicalLinkControl(
+            str(llc[0]),
+            str(llc[1]),
+            str(llc[2]),
+            llc[3:6].hex(),
+            llc[6:8].hex()
+        )
+
 class DataFrameParser(Parser):
     def parse(self, frame: bytes) -> Frame:
         radio_tap_header, frame = RadioTapHeaderParser.parse(frame)
-        frame_control = ManagementFrameFrameControlParser.parse(frame[0:2])
+        frame_control = FrameControlParser.parse(frame[0:2])
         duration: str = frame[2:4].hex()
 
         # todo need to specify this to subtype and parse then
