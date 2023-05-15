@@ -119,3 +119,18 @@ class LogicalLinkControlAuthenticationFilter(Filter):
         llc = QoSDataFrameLogicalLinkControlParser.parse(frame[26:34])
 
         return llc.llc_type == self.LLC_AUTHENTICATION_TYPE
+
+
+class AuthenticationKeyTypeFilter(Filter):
+
+    AUTHENTICATION_VERSION = "01"
+    AUTHENTICATION_KEY_TYPE = "03"
+    AUTHENTICATION_KEY_DESCRIPTOR_TYPE = "02"
+
+    def match(self, frame: bytes) -> bool:
+        _, frame = RadioTapHeaderParser.parse(frame)
+
+        # skip to 802.1x part
+        frame = frame[34:]
+
+        return frame[0:2].hex() == self.AUTHENTICATION_VERSION + self.AUTHENTICATION_KEY_TYPE and hex(frame[4]).lstrip("0x").zfill(2) == self.AUTHENTICATION_KEY_DESCRIPTOR_TYPE

@@ -1,4 +1,5 @@
 from abc import ABC
+from enum import Enum
 from typing import Dict, Tuple
 
 
@@ -146,4 +147,99 @@ class DataFrame(Frame):
                f"src addr = {self.source_addr}, " \
                f"frame number and sequence = {self.frame_number_and_sequence}, " \
                f"TKIP = {self.tkip_params}, " \
+               f"}}"
+
+
+class EAPOLHandshakeNumber(Enum):
+    M1 = 1
+    M2 = 2
+    M3 = 3
+    M4 = 4
+
+
+class EAPOLHandshakeKeyInfo:
+    def __init__(
+            self,
+            key_descriptor_version: str,
+            key_type: int,
+            key_index: str,
+            install: int,
+            key_ack: int,
+            key_mic: int,
+            secure: int,
+            error: int,
+            request: int,
+            encrypted_key_data: int,
+            smk_message: int,
+    ):
+        self.key_descriptor_version: str = key_descriptor_version
+        self.key_type: int = key_type
+        self.key_index: str = key_index
+        self.install: int = install
+        self.key_ack: int = key_ack
+        self.key_mic: int = key_mic
+        self.secure: int = secure
+        self.error: int = error
+        self.request: int = request
+        self.encrypted_key_data: int = encrypted_key_data
+        self.smk_message: int = smk_message
+
+    def full(self) -> str:
+        return f"..{self.smk_message}{self.encrypted_key_data}{self.request}{self.error}{self.secure}{self.key_mic}{self.key_ack}{self.install}{self.key_index}{self.key_type}{self.key_descriptor_version}"
+
+    def __str__(self):
+        return self.full()
+
+
+class EAPOLHandshakeFrame(Frame):
+    def __init__(
+            self,
+            message_number: EAPOLHandshakeNumber,
+            version: str,
+            key_type: str,
+            length: str,
+            key_descriptor_type: str,
+            key_info: EAPOLHandshakeKeyInfo,
+            key_length: int,
+            replay_counter: int,
+            wpa_key_nonce: str,
+            key_iv: str,
+            key_rsc: str,
+            key_id: str,
+            key_mic: str,
+            key_data_length: int,
+            key_data: str,
+    ):
+        self.message_number: EAPOLHandshakeNumber = message_number
+        self.version: str = version
+        self.key_type: str = key_type
+        self.length: str = length
+        self.key_descriptor_type: str = key_descriptor_type
+        self.key_info: EAPOLHandshakeKeyInfo = key_info
+        self.key_length: int = key_length
+        self.replay_counter: int = replay_counter
+        self.wpa_key_nonce: str = wpa_key_nonce
+        self.key_iv: str = key_iv
+        self.key_rsc: str = key_rsc
+        self.key_id: str = key_id
+        self.key_mic: str = key_mic
+        self.key_data_length: int = key_data_length
+        self.key_data: str = key_data
+
+    def __str__(self):
+        return f"EAPOLHandshake M{self.message_number} = {{ " \
+               f"version = {self.version} " \
+               f"key type = {self.key_type} " \
+               f"length = {self.length} " \
+               f"key description type = {self.key_descriptor_type} " \
+               f"key info = {self.key_info} " \
+               f"key length = {self.key_length} " \
+               f"replay counter = {self.replay_counter} " \
+               f"wpa key nonce = {self.wpa_key_nonce} " \
+               f"key IV = {self.key_iv} " \
+               f"key rsc = {self.key_rsc} " \
+               f"key id = {self.key_id} " \
+               f"key MIC = {self.key_mic} " \
+               f"key data length = {self.key_data_length} " \
+               f"key data = {self.key_data} " \
                f"}}"

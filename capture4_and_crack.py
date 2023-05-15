@@ -1,18 +1,19 @@
 from core.filters import FilterAggregate, RadioTapHeaderFilter, DataFrameFilter, QoSDataFrameFilter, \
-    LogicalLinkControlAuthenticationFilter
-from core.parser import RawDataParser
+    LogicalLinkControlAuthenticationFilter, AuthenticationKeyTypeFilter
+from core.parser import RawDataParser, EAPOLHandshakeFrameParser
 from core.sniffer import PacketSniffer
 
 iface = "wlp4s0mon"
 
 packet_sniffer = PacketSniffer(
     iface,
-    RawDataParser(),
+    EAPOLHandshakeFrameParser(),
     FilterAggregate(
         RadioTapHeaderFilter(),
         DataFrameFilter(),
         QoSDataFrameFilter(),
         LogicalLinkControlAuthenticationFilter(),
+        # AuthenticationKeyTypeFilter()
     )
 )
 
