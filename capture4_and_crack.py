@@ -13,7 +13,7 @@ packet_sniffer = PacketSniffer(
         DataFrameFilter(),
         QoSDataFrameFilter(),
         LogicalLinkControlAuthenticationFilter(),
-        # AuthenticationKeyTypeFilter()
+        AuthenticationKeyTypeFilter()
     )
 )
 

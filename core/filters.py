@@ -123,9 +123,8 @@ class LogicalLinkControlAuthenticationFilter(Filter):
 
 class AuthenticationKeyTypeFilter(Filter):
 
-    AUTHENTICATION_VERSION = "01"
-    AUTHENTICATION_KEY_TYPE = "03"
-    AUTHENTICATION_KEY_DESCRIPTOR_TYPE = "02"
+    AUTHENTICATION_KEY_TYPE = "3"
+    AUTHENTICATION_KEY_DESCRIPTOR_TYPE = "2"
 
     def match(self, frame: bytes) -> bool:
         _, frame = RadioTapHeaderParser.parse(frame)
@@ -133,4 +132,4 @@ class AuthenticationKeyTypeFilter(Filter):
         # skip to 802.1x part
         frame = frame[34:]
 
-        return frame[0:2].hex() == self.AUTHENTICATION_VERSION + self.AUTHENTICATION_KEY_TYPE and hex(frame[4]).lstrip("0x").zfill(2) == self.AUTHENTICATION_KEY_DESCRIPTOR_TYPE
+        return hex(frame[1]) == "0x" + self.AUTHENTICATION_KEY_TYPE and hex(frame[4]) == "0x" + self.AUTHENTICATION_KEY_DESCRIPTOR_TYPE
