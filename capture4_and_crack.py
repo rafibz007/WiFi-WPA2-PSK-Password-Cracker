@@ -1,5 +1,5 @@
 from core.filters import FilterAggregate, RadioTapHeaderFilter, DataFrameFilter, QoSDataFrameFilter, \
-    LogicalLinkControlAuthenticationFilter, AuthenticationKeyTypeFilter
+    LogicalLinkControlAuthenticationFilter, AuthenticationKeyTypeFilter, CRC32Filter
 from core.parser import RawDataParser, EAPOLHandshakeFrameParser
 from core.sniffer import PacketSniffer
 
@@ -9,6 +9,7 @@ packet_sniffer = PacketSniffer(
     iface,
     EAPOLHandshakeFrameParser(),
     FilterAggregate(
+        CRC32Filter(),
         RadioTapHeaderFilter(),
         DataFrameFilter(),
         QoSDataFrameFilter(),

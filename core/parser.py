@@ -22,7 +22,7 @@ class EthernetParser(Parser):
         dst: str = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), raw_packet[0:6]))
         type_len: str = raw_packet[12:14].hex()
         data: str = raw_packet[14:-4].hex()
-        crc: str = raw_packet[-4:-1].hex()
+        crc: str = raw_packet[-4:].hex()
 
         return EthernetFrame(src, dst, type_len, data, crc)
 
@@ -104,7 +104,7 @@ class ManagementFrameParser(Parser):
         bssid: str = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[16:22]))
         sequence_control: str = frame[22:24].hex()
         body: ManagementFrameBody = ManagementFrameBodyParser.parse(frame[24: -4])
-        fcs: str = frame[-4: -1].hex()
+        fcs: str = frame[-4:].hex()
 
         return ManagementFrame(
             radio_tap_header,
@@ -129,37 +129,6 @@ class QoSDataFrameLogicalLinkControlParser:
             str(llc[2]),
             llc[3:6].hex(),
             llc[6:8].hex()
-        )
-
-
-class DataFrameParser(Parser):
-    def parse(self, frame: bytes) -> Frame:
-        radio_tap_header, frame = RadioTapHeaderParser.parse(frame)
-        frame_control = FrameControlParser.parse(frame[0:2])
-        duration: str = frame[2:4].hex()
-
-        # todo need to specify this to subtype and parse then
-        # todo FIRST DETERMINE WHICH SUBTYPE CAN BE USED TO CHECK WETHER USER IS CONNECTED
-        # TODO THEN FILTER CORRECTLY
-        dest_addr = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[4:10]))
-        bssid = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[10:16]))
-        source_addr = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[16:22]))
-        frame_number_and_sequence = frame[22:24].hex()
-        tkip_params = frame[24:32].hex()
-        data = frame[50:-4].hex()
-        check_sequence = frame[-4:-1].hex()
-
-        return DataFrame(
-            radio_tap_header,
-            frame_control,
-            duration,
-            dest_addr,
-            bssid,
-            source_addr,
-            frame_number_and_sequence,
-            tkip_params,
-            data,
-            check_sequence,
         )
 
 
@@ -202,7 +171,7 @@ class EAPOLHandshakeFrameParser(Parser):
         frame_number_and_sequence = frame[22:24].hex()
         qos_control = frame[24:26].hex()
 
-        check_sequence = frame[-4:-1].hex()
+        check_sequence = frame[-4:].hex()
 
         llc = QoSDataFrameLogicalLinkControlParser.parse(frame[26:34])
 

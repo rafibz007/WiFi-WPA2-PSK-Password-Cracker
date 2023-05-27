@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from core.parser import RadioTapHeaderParser, FrameControlParser, QoSDataFrameLogicalLinkControlParser
+from utils.frames import calculate_crc32
 
 
 class Filter(ABC):
@@ -34,6 +35,17 @@ class AllMatchFilter(Filter):
         return True
 
 
+class CRC32Filter(Filter):
+
+    def match(self, frame: bytes) -> bool:
+        _, frame = RadioTapHeaderParser.parse(frame)
+
+        actual_crc = calculate_crc32(frame[:-4])
+        received_crc = frame[-4:]
+
+        return actual_crc == received_crc
+
+
 class RadioTapHeaderFilter(Filter):
 
     # expected values
@@ -57,7 +69,8 @@ class ManagementFrameFilter(Filter):
 
         frame_control = FrameControlParser.parse(frame[0:2])
 
-        return frame_control.proto_version == self.PROTO_VERSION and frame_control.frame_type == self.MANAGEMENT_FRAME_TYPE
+        return frame_control.proto_version == self.PROTO_VERSION \
+            and frame_control.frame_type == self.MANAGEMENT_FRAME_TYPE
 
 
 class BeaconFrameFilter(Filter):
@@ -93,8 +106,8 @@ class DataFrameFilter(Filter):
 
         frame_control = FrameControlParser.parse(frame[0:2])
 
-        return frame_control.proto_version == self.PROTO_VERSION and frame_control.frame_type == self.DATA_FRAME_TYPE
-
+        return frame_control.proto_version == self.PROTO_VERSION \
+            and frame_control.frame_type == self.DATA_FRAME_TYPE
 
 class QoSDataFrameFilter(Filter):
 

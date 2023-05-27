@@ -12,6 +12,7 @@ packet_sniffer = PacketSniffer(
     iface,
     ManagementFrameParser(),
     FilterAggregate(
+        CRC32Filter(),
         RadioTapHeaderFilter(),
         ManagementFrameFilter(),
         FilterAlternative(

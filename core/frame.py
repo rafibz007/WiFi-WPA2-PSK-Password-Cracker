@@ -197,7 +197,7 @@ class EAPOLHandshakeFrame(Frame):
             message_number: EAPOLHandshakeNumber,
             version: str,
             key_type: str,
-            length: str,
+            length: int,
             key_descriptor_type: str,
             key_info: EAPOLHandshakeKeyInfo,
             key_length: int,
@@ -213,7 +213,7 @@ class EAPOLHandshakeFrame(Frame):
         self.message_number: EAPOLHandshakeNumber = message_number
         self.version: str = version
         self.key_type: str = key_type
-        self.length: str = length
+        self.length: int = length
         self.key_descriptor_type: str = key_descriptor_type
         self.key_info: EAPOLHandshakeKeyInfo = key_info
         self.key_length: int = key_length
