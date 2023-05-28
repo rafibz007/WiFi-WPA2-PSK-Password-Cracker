@@ -12,11 +12,14 @@ packet_sniffer = PacketSniffer(
         CRC32Filter(),
         RadioTapHeaderFilter(),
         DataFrameFilter(),
+        # add filter for bssid
         QoSDataFrameFilter(),
         LogicalLinkControlAuthenticationFilter(),
         AuthenticationKeyTypeFilter()
     )
 )
+
+captured_handshakes = {}
 
 for packet in packet_sniffer.listen():
     print(packet)

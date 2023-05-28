@@ -41,6 +41,9 @@ class FrameControl:
         self.frame_type: str = frame_type
         self.frame_subtype: str = frame_subtype
 
+    def full(self):
+        return self.frame_subtype + self.frame_type + self.proto_version
+
     def __str__(self):
         return f"FrameControl: {{ proto_version = {self.proto_version}, " \
                f"type = {self.frame_type}, " \
@@ -243,3 +246,26 @@ class EAPOLHandshakeFrame(Frame):
                f"key data length = {self.key_data_length} " \
                f"key data = {self.key_data} " \
                f"}}"
+
+
+class DeauthenticationFrame(Frame):
+    def __init__(self, bssid: str, dest_addr: str = "ff:ff:ff:ff:ff:ff"):
+        self.frame_control = FrameControl("00", "00", "1100")
+        self.flags = "00"
+        self.duration = "3a01"
+        self.dest_addr = dest_addr
+        self.src_addr = bssid
+        self.bssid = bssid
+        self.frame_number_sequence = "0000"
+        self.fixed_params = "0700"
+
+    def to_bytes(self):
+        frame_control = hex(int(self.frame_control.full(), 2)).lstrip("0x").zfill(2)
+        bssid = "".join(self.bssid.lower().split(":"))
+        src_addr = "".join(self.src_addr.lower().split(":"))
+        dest_addr = "".join(self.dest_addr.lower().split(":"))
+
+        data = "".join([frame_control, self.flags, self.duration, dest_addr, src_addr, bssid,
+                        self.frame_number_sequence, self.fixed_params])
+
+        return bytes.fromhex(data)
