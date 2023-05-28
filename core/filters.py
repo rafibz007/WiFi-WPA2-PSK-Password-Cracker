@@ -109,6 +109,20 @@ class DataFrameFilter(Filter):
         return frame_control.proto_version == self.PROTO_VERSION \
             and frame_control.frame_type == self.DATA_FRAME_TYPE
 
+
+class DataFrameBssidFilter(Filter):
+
+    def __init__(self, bssid: str):
+        self.bssid = bssid
+
+    def match(self, frame: bytes) -> bool:
+        _, frame = RadioTapHeaderParser.parse(frame)
+
+        bssid: str = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[16:22]))
+
+        return self.bssid == bssid
+
+
 class QoSDataFrameFilter(Filter):
 
     QOS_DATA_SUBTYPE = "1000"

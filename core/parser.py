@@ -167,7 +167,7 @@ class EAPOLHandshakeFrameParser(Parser):
 
         dest_addr = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[4:10]))
         bssid = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[10:16]))
-        source_addr = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[16:22]))
+        src_addr = ":".join(map(lambda byte: hex(byte).lstrip("0x").zfill(2), frame[16:22]))
         frame_number_and_sequence = frame[22:24].hex()
         qos_control = frame[24:26].hex()
 
@@ -210,6 +210,9 @@ class EAPOLHandshakeFrameParser(Parser):
             raise RuntimeWarning("Unrecognised KeyInfo. Skipping packet")
 
         return EAPOLHandshakeFrame(
+            dest_addr,
+            bssid,
+            src_addr,
             message,
             version,
             key_type,

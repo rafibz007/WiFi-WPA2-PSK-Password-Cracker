@@ -197,6 +197,9 @@ class EAPOLHandshakeKeyInfo:
 class EAPOLHandshakeFrame(Frame):
     def __init__(
             self,
+            dest_addr: str,
+            bssid: str,
+            src_addr: str,
             message_number: EAPOLHandshakeNumber,
             version: str,
             key_type: str,
@@ -213,6 +216,9 @@ class EAPOLHandshakeFrame(Frame):
             key_data_length: int,
             key_data: str,
     ):
+        self.dest_addr: str = dest_addr
+        self.bssid: str = bssid
+        self.src_addr: str = src_addr
         self.message_number: EAPOLHandshakeNumber = message_number
         self.version: str = version
         self.key_type: str = key_type
