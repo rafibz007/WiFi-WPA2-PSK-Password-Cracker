@@ -25,16 +25,11 @@ class PacketSniffer:
 
 
 class PacketSender:
-    SO_BINDTODEVICE = 25
-    ETH_P_ALL = 0x0003
 
     def __init__(self, iface: str):
         self._iface = iface
-        self._socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(self.ETH_P_ALL))
+        self._socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.PACKET_OTHERHOST)
         self._socket.bind((self._iface, 0))
 
-    def send(self, raw_data: bytes):
-        with socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(self.ETH_P_ALL)) as sock:
-            sock.bind((self._iface, 0))
-            sock.send(raw_data)
-        # self._socket.sendall(raw_data)
+    def send(self, raw_data: bytes, radiotap_header=b"\x00\x00\x08\x00\x00\x00\x00\x00"):
+        self._socket.sendall(radiotap_header + raw_data)
