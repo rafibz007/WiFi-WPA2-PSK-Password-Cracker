@@ -19,7 +19,6 @@ class PacketSniffer:
             sock.bind((self._iface, 0))
             while True:
                 frame = sock.recv(2000)
-                # print(type(frame), frame)
                 if self._filter.match(frame):
                     yield self._parser.parse(frame)
 

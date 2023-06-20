@@ -12,8 +12,8 @@ packet_sniffer = PacketSniffer(
     iface,
     ManagementFrameParser(),
     FilterAggregate(
-        CRC32Filter(),
         RadioTapHeaderFilter(),
+        CRC32Filter(),
         ManagementFrameFilter(),
         FilterAlternative(
             BeaconFrameFilter(),
